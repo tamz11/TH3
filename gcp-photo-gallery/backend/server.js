@@ -154,7 +154,7 @@ app.get('/api/photos', authenticateToken, async (req, res) => {
     }
 });
 
-const PORT = 3001;
-app.listen(PORT, () => {
-    console.log(`Backend server đang chạy tại http://localhost:${PORT}`);
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Backend server đang chạy tại port ${PORT}`);
 });
