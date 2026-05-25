@@ -4,6 +4,8 @@ import { LogOut, ImagePlus, Loader2, Calendar, Camera } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { vi } from 'date-fns/locale';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
 export default function Dashboard() {
   const [photos, setPhotos] = useState([]);
   const [file, setFile] = useState(null);
@@ -25,7 +27,7 @@ export default function Dashboard() {
 
   const fetchPhotos = async () => {
     try {
-      const res = await axios.get('http://localhost:3001/api/photos', {
+      const res = await axios.get(`${API_BASE_URL}/api/photos`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setPhotos(res.data);
@@ -47,14 +49,14 @@ export default function Dashboard() {
       const formData = new FormData();
       formData.append('image', file);
       
-      const uploadRes = await axios.post('http://localhost:3001/api/upload', formData, {
+      const uploadRes = await axios.post(`${API_BASE_URL}/api/upload`, formData, {
         headers: { 
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`
         }
       });
       
-      await axios.post('http://localhost:3001/api/photos', {
+      await axios.post(`${API_BASE_URL}/api/photos`, {
         title,
         description,
         imageUrl: uploadRes.data.url,
