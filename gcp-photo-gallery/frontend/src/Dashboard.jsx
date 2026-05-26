@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { LogOut, ImagePlus, Loader2, Calendar, Camera } from 'lucide-react';
+import { LogOut, ImagePlus, Loader2, Calendar, Camera, Search, Bell, Home, FolderHeart, Settings, LayoutGrid, Image as ImageIcon } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { vi } from 'date-fns/locale';
 
@@ -88,144 +88,258 @@ export default function Dashboard() {
     return acc;
   }, {});
 
+  const menuItems = [
+    { icon: Home, label: 'Trang chủ', active: true },
+    { icon: ImageIcon, label: 'Tất cả ảnh' },
+    { icon: FolderHeart, label: 'Album yêu thích' },
+    { icon: Settings, label: 'Cài đặt' },
+  ];
+  const [activeMenu, setActiveMenu] = useState('Trang chủ');
+
   return (
-    <div className="min-h-screen bg-[#F8FAFC] pb-20 font-inter">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <div className="bg-gradient-to-tr from-blue-600 to-purple-600 p-2 rounded-xl shadow-lg shadow-blue-500/20">
-              <Camera size={24} className="text-white" />
-            </div>
-            <span className="text-xl sm:text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 hidden sm:block tracking-tight">
-              Kỷ Niệm Đám Mây
-            </span>
+    <div className="flex h-screen bg-[#F8FAFC] font-inter overflow-hidden text-gray-800">
+      {/* SIDEBAR - Desktop */}
+      <aside className="w-64 bg-white border-r border-gray-200 hidden lg:flex flex-col z-20">
+        <div className="h-20 flex items-center px-6 border-b border-gray-100 shrink-0">
+          <div className="bg-gradient-to-tr from-blue-600 to-purple-600 p-2 rounded-xl shadow-md mr-3">
+            <Camera size={22} className="text-white" />
           </div>
-          <div className="flex items-center gap-3 sm:gap-5">
-            <div className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-full border border-gray-200/60 shadow-sm">
-              <div className="w-7 h-7 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white text-xs font-bold">
+          <span className="text-xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 tracking-tight">Kỷ Niệm Của Bạn</span>
+        </div>
+        
+        <div className="flex-1 py-8 px-5 space-y-2 overflow-y-auto w-full">
+          <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 px-2">Menu Chính</p>
+          {menuItems.map(item => (
+            <button 
+              key={item.label}
+              onClick={() => setActiveMenu(item.label)}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-semibold text-sm outline-none ${item.label === activeMenu ? 'bg-blue-50 text-blue-600 shadow-sm' : 'text-gray-600 hover:bg-gray-50'}`}
+            >
+              <item.icon size={20} strokeWidth={item.label === activeMenu ? 2.5 : 2} />
+              {item.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="p-5 border-t border-gray-100 w-full">
+          <button onClick={logout} className="w-full flex items-center justify-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-colors font-bold text-sm outline-none">
+            <LogOut size={20} strokeWidth={2.5} />
+            Đăng xuất
+          </button>
+        </div>
+      </aside>
+
+      {/* MAIN CONTENT AREA */}
+      <div className="flex-1 flex flex-col h-screen overflow-hidden relative w-full">
+        
+        {/* HEADER */}
+        <header className="h-20 bg-white/90 backdrop-blur-md border-b border-gray-200 flex items-center justify-between px-6 sm:px-10 z-10 shrink-0 w-full">
+          <div className="flex items-center lg:hidden gap-3">
+            <div className="bg-gradient-to-tr from-blue-600 to-purple-600 p-2 rounded-xl shadow-md">
+              <Camera size={20} className="text-white" />
+            </div>
+          </div>
+          
+          <div className="hidden md:flex items-center bg-gray-100/80 hover:bg-gray-100 px-5 py-2.5 rounded-full w-[400px] border border-transparent focus-within:bg-white focus-within:ring-4 focus-within:ring-blue-500/10 focus-within:border-blue-300 transition-all ml-4">
+            <Search size={18} className="text-gray-400 mr-3" />
+            <input type="text" placeholder="Tìm kiếm kỷ niệm, địa điểm..." className="bg-transparent border-none outline-none w-full text-sm font-medium text-gray-700 placeholder:text-gray-400" />
+          </div>
+          
+          <div className="flex items-center gap-5 ml-auto">
+            <button className="p-2 text-gray-400 hover:text-blue-600 transition-colors relative hidden sm:block outline-none">
+              <Bell size={22} />
+              <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+            </button>
+            <div className="h-8 w-px bg-gray-200 hidden sm:block"></div>
+            <div className="flex items-center gap-3 cursor-pointer group">
+              <div className="text-right hidden sm:block group-hover:text-blue-600 transition-colors">
+                <p className="text-sm font-bold leading-tight">{username}</p>
+                <p className="text-xs font-medium opacity-80">Quản trị viên</p>
+              </div>
+              <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold shadow-md shadow-blue-500/20">
                 {username ? username.charAt(0).toUpperCase() : 'U'}
               </div>
-              <span className="text-gray-700 font-semibold text-sm hidden sm:block tracking-wide">{username}</span>
             </div>
-            <button onClick={logout} className="p-2 sm:px-4 sm:py-2 flex items-center gap-2 text-red-500 hover:bg-red-50 hover:text-red-700 rounded-full sm:rounded-xl transition-colors font-semibold">
-              <LogOut size={18} strokeWidth={2.5} />
-              <span className="hidden sm:block text-sm">Đăng xuất</span>
+            <button onClick={logout} className="p-2 text-gray-400 hover:bg-red-50 hover:text-red-500 rounded-lg lg:hidden transition-colors outline-none">
+              <LogOut size={22} />
             </button>
           </div>
-        </div>
-      </header>
+        </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 flex flex-col md:flex-row gap-8">
-        {/* Upload Form */}
-        <div className="md:w-[320px] lg:w-[380px] shrink-0">
-          <div className="bg-white p-6 sm:p-7 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 sticky top-28">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-2.5 bg-blue-50 text-blue-600 rounded-xl shadow-sm border border-blue-100">
-                <ImagePlus size={22} strokeWidth={2.5} />
-              </div>
-              <h3 className="text-xl font-extrabold text-gray-800 tracking-tight">Thêm kỷ niệm</h3>
-            </div>
-            <form onSubmit={handleUpload} className="space-y-4">
-              <div className="space-y-1.5">
-                <label className="block text-sm font-bold text-gray-700">Ảnh của bạn</label>
-                <div className="flex items-center justify-center w-full">
-                  <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-2xl cursor-pointer bg-gray-50/50 hover:bg-blue-50/50 hover:border-blue-400 transition-colors group">
-                    <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
-                      <ImagePlus className="w-8 h-8 mb-2 text-gray-400 group-hover:text-blue-500 transition-colors" />
-                      <p className="text-xs text-gray-500 font-medium line-clamp-1">{file ? file.name : 'Nhấn để chọn ảnh'}</p>
-                    </div>
-                    <input id="dropzone-file" type="file" className="hidden" accept="image/*" onChange={e => setFile(e.target.files[0])} required={!file} />
-                  </label>
+        {/* SCROLLABLE MAIN */}
+        <main className="flex-1 overflow-y-auto p-4 sm:p-8 lg:p-10 w-full">
+          <div className="max-w-[1600px] mx-auto space-y-10">
+            
+            {/* STATS SECTION */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-center gap-5 hover:shadow-md transition-shadow">
+                <div className="w-14 h-14 bg-sky-50 text-sky-600 rounded-2xl flex items-center justify-center shadow-inner shrink-0"><ImageIcon size={26} strokeWidth={2} /></div>
+                <div>
+                  <p className="text-sm font-bold text-gray-400 tracking-wide uppercase mb-1">Tổng Số Ảnh</p>
+                  <p className="text-3xl font-black text-gray-800">{photos.length}</p>
                 </div>
               </div>
-              <div className="space-y-1.5">
-                <label className="block text-sm font-bold text-gray-700">Chủ đề</label>
-                <input 
-                  type="text" required placeholder="Ví dụ: Chuyến đi Đà Lạt..."
-                  className="w-full px-4 py-3 bg-gray-50/50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 focus:bg-white transition-all text-sm font-medium placeholder:font-normal text-gray-800"
-                  value={title} onChange={e => setTitle(e.target.value)}
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="block text-sm font-bold text-gray-700">Ngày kỷ niệm</label>
-                <div className="relative">
-                  <Calendar className="absolute top-3 left-4 h-5 w-5 text-gray-400" />
-                  <input 
-                    type="date" required
-                    className="pl-12 w-full px-4 py-3 bg-gray-50/50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 focus:bg-white transition-all text-sm font-medium text-gray-800"
-                    value={date} onChange={e => setDate(e.target.value)}
-                  />
+              <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-center gap-5 hover:shadow-md transition-shadow">
+                <div className="w-14 h-14 bg-fuchsia-50 text-fuchsia-600 rounded-2xl flex items-center justify-center shadow-inner shrink-0"><FolderHeart size={26} strokeWidth={2} /></div>
+                <div>
+                  <p className="text-sm font-bold text-gray-400 tracking-wide uppercase mb-1">Album Đã Tạo</p>
+                  <p className="text-3xl font-black text-gray-800">{Object.keys(groupedPhotos).length}</p>
                 </div>
               </div>
-              <div className="space-y-1.5">
-                <label className="block text-sm font-bold text-gray-700">Kể lại đôi chút</label>
-                <textarea 
-                  rows="3" placeholder="Hôm đó trời rất đẹp..."
-                  className="w-full px-4 py-3 bg-gray-50/50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 focus:bg-white transition-all text-sm font-medium resize-none placeholder:font-normal text-gray-800"
-                  value={description} onChange={e => setDescription(e.target.value)}
-                ></textarea>
+              <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-center gap-5 hover:shadow-md transition-shadow">
+                <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center shadow-inner shrink-0"><Calendar size={26} strokeWidth={2} /></div>
+                <div>
+                  <p className="text-sm font-bold text-gray-400 tracking-wide uppercase mb-1">Lần Đổi Mới Nhất</p>
+                  <p className="text-lg font-black text-gray-800">{photos.length > 0 ? format(parseISO(photos[0].date), 'dd/MM/yyyy') : 'Chưa có'}</p>
+                </div>
               </div>
-              <button 
-                type="submit" disabled={loading}
-                className="w-full bg-gradient-to-r from-blue-600 to-blue-500 text-white font-bold py-3.5 rounded-xl shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] hover:shadow-[0_6px_20px_rgba(37,99,235,0.23)] hover:-translate-y-0.5 transition-all flex justify-center items-center gap-2 mt-6 disabled:opacity-70 disabled:hover:translate-y-0"
-              >
-                {loading ? <><Loader2 className="animate-spin" size={20}/> Đang tải lên...</> : 'Lưu Giữ Kỷ Niệm'}
-              </button>
-            </form>
-          </div>
-        </div>
-
-        {/* Timeline Gallery */}
-        <div className="md:flex-1">
-          {Object.keys(groupedPhotos).length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full py-20 px-4 text-center bg-white rounded-3xl border border-dashed border-gray-200 shadow-sm mt-8 md:mt-0">
-              <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mb-5 shadow-inner">
-                <Camera size={36} className="text-blue-400" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-2">Chưa có kỷ niệm nào</h3>
-              <p className="text-gray-500 max-w-sm text-sm">Hãy tạo album đầu tiên bằng cách tải lên những bức ảnh yêu thích của bạn nhé!</p>
             </div>
-          ) : (
-            <div className="space-y-12 pb-10">
-              {Object.entries(groupedPhotos).map(([monthYear, monthPhotos]) => (
-                <div key={monthYear} className="relative">
-                  <div className="flex items-center gap-4 mb-6 sticky top-24 z-30 pt-4 pb-2 bg-[#F8FAFC]/90 backdrop-blur-sm">
-                    <h2 className="text-lg font-black text-gray-800 capitalize bg-white px-5 py-2 rounded-full shadow-sm border border-gray-100/50 inline-block">
-                      {monthYear}
-                    </h2>
-                    <div className="h-px bg-gradient-to-r from-gray-200 to-transparent flex-1 rounded-full"></div>
+
+            {/* CONTENT SPLIT: GALLERY vs UPLOAD */}
+            <div className="flex flex-col-reverse xl:flex-row gap-10">
+              
+              {/* TIMELINE GALLERY */}
+              <div className="flex-1 w-full relative">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+                  <h2 className="text-2xl font-black text-gray-800 tracking-tight">Thư viện Kỷ niệm</h2>
+                  <div className="flex items-center gap-2 bg-white p-1 rounded-xl shadow-sm border border-gray-200">
+                    <button className="px-4 py-2 bg-gray-100 text-gray-800 rounded-lg text-sm font-bold flex items-center gap-2 outline-none">
+                       <LayoutGrid size={16} /> Lưới
+                    </button>
+                    <button className="px-4 py-2 hover:bg-gray-50 text-gray-500 rounded-lg text-sm font-bold flex items-center gap-2 transition-colors outline-none">
+                       Danh sách
+                    </button>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                    {monthPhotos.map(photo => (
-                      <div key={photo.id} className="group bg-white rounded-3xl overflow-hidden shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.1)] transition-all duration-500 border border-gray-100 flex flex-col hover:-translate-y-1">
-                        <div className="aspect-[4/4] sm:aspect-[4/3] w-full relative overflow-hidden bg-gray-100">
-                          <img 
-                            src={photo.imageUrl} 
-                            alt={photo.title} 
-                            className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 ease-out" 
-                            loading="lazy"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-gray-900/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </div>
+
+                {Object.keys(groupedPhotos).length === 0 ? (
+                  <div className="w-full h-80 bg-white border-2 border-dashed border-gray-200 rounded-3xl flex flex-col items-center justify-center text-center p-6 shadow-sm">
+                    <div className="w-24 h-24 bg-gray-50 text-gray-300 rounded-full flex items-center justify-center mb-6 shadow-inner">
+                      <Camera size={40} />
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-800 mb-2">Chưa có kỷ niệm nào</h3>
+                    <p className="text-gray-500 max-w-sm">Tải lên những bức ảnh đầu tiên để tạo album cho riêng bạn ở cột bên cạnh.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-12 pb-10">
+                    {Object.entries(groupedPhotos).map(([monthYear, monthPhotos]) => (
+                      <div key={monthYear} className="relative">
+                        <div className="flex items-center gap-4 mb-8 sticky top-0 z-10 py-2 bg-[#F8FAFC]/90 backdrop-blur-sm">
+                          <h2 className="text-base font-black text-gray-800 uppercase tracking-wider bg-white px-5 py-2.5 rounded-2xl shadow-sm border border-gray-100 inline-flex items-center gap-2 shrink-0">
+                            <Calendar size={18} className="text-blue-500" /> {monthYear}
+                          </h2>
+                          <div className="h-0.5 bg-gradient-to-r from-gray-200 to-transparent flex-1 rounded-full"></div>
                         </div>
-                        <div className="p-5 flex-1 flex flex-col bg-white z-10 relative">
-                          <div className="flex justify-between items-start gap-3 mb-2">
-                            <h4 className="text-base font-bold text-gray-900 leading-tight">{photo.title}</h4>
-                            <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full whitespace-nowrap border border-blue-100">
-                              {format(parseISO(photo.date), 'dd/MM')}
-                            </span>
-                          </div>
-                          <p className="text-sm text-gray-500 line-clamp-3 leading-relaxed mt-1 font-medium">{photo.description}</p>
+                        
+                        <div className="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3 gap-6">
+                          {monthPhotos.map(photo => (
+                            <div key={photo.id} className="group bg-white rounded-3xl overflow-hidden shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-xl transition-all duration-500 border border-gray-100 flex flex-col sm:hover:-translate-y-1.5 focus-within:ring-4 focus-within:ring-blue-500/20">
+                              <div className="aspect-[4/3] w-full relative overflow-hidden bg-gray-50">
+                                <img 
+                                  src={photo.imageUrl} 
+                                  alt={photo.title} 
+                                  className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 ease-out" 
+                                  loading="lazy"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-gray-900/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                              </div>
+                              <div className="p-6 flex-1 flex flex-col bg-white z-10 relative">
+                                <div className="flex justify-between items-start gap-4 mb-3">
+                                  <h4 className="text-lg font-black text-gray-900 leading-tight">{photo.title}</h4>
+                                  <span className="text-xs font-bold text-blue-700 bg-blue-50 px-3 py-1.5 rounded-full whitespace-nowrap border border-blue-100/50 shadow-sm shrink-0">
+                                    {format(parseISO(photo.date), 'dd/MM')}
+                                  </span>
+                                </div>
+                                <p className="text-sm text-gray-500 line-clamp-3 leading-relaxed font-medium">{photo.description}</p>
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     ))}
                   </div>
+                )}
+              </div>
+
+              {/* UPLOAD FORM - FIXED SIDEBAR ON XXL */}
+              <div className="xl:w-[420px] shrink-0 w-full">
+                <div className="bg-white p-7 sm:p-8 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 xl:sticky xl:top-4">
+                  <div className="flex items-center gap-3 mb-8">
+                    <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl shadow-inner border border-blue-100">
+                      <ImagePlus size={24} strokeWidth={2.5} />
+                    </div>
+                    <h3 className="text-2xl font-black text-gray-800 tracking-tight">Thêm ảnh mới</h3>
+                  </div>
+                  
+                  <form onSubmit={handleUpload} className="space-y-5">
+                    <div className="space-y-2">
+                      <label className="block text-sm font-bold text-gray-700">Tải ảnh lên</label>
+                      <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full h-[140px] border-2 border-dashed border-gray-300 rounded-2xl cursor-pointer bg-gray-50 hover:bg-blue-50/50 hover:border-blue-400 transition-all group overflow-hidden relative">
+                        {file ? (
+                          <div className="flex items-center justify-center w-full h-full bg-blue-50">
+                             <div className="text-center p-4">
+                               <ImageIcon className="w-8 h-8 text-blue-500 mx-auto mb-2" />
+                               <p className="text-sm font-bold text-blue-700 line-clamp-1 truncate px-2 w-full">{file.name}</p>
+                               <span className="text-xs text-blue-500 font-medium">Nhấn để đổi ảnh khác</span>
+                             </div>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
+                            <div className="w-12 h-12 bg-white rounded-full shadow-sm flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                              <ImagePlus className="w-6 h-6 text-gray-400 group-hover:text-blue-500 transition-colors" />
+                            </div>
+                            <p className="text-sm font-bold text-gray-600">Kéo thả hoặc nhấn vào đây</p>
+                            <p className="text-xs text-gray-400 mt-1">Định dạng JPG, PNG, WEBP</p>
+                          </div>
+                        )}
+                        <input id="dropzone-file" type="file" className="hidden" accept="image/*" onChange={e => setFile(e.target.files[0])} required={!file} />
+                      </label>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="block text-sm font-bold text-gray-700">Chủ đề album</label>
+                      <input 
+                        type="text" required placeholder="Ví dụ: Chuyến đi Đà Lạt..."
+                        className="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-sm font-bold placeholder:font-medium placeholder:text-gray-400 text-gray-800"
+                        value={title} onChange={e => setTitle(e.target.value)}
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="block text-sm font-bold text-gray-700">Ngày chụp</label>
+                      <div className="relative">
+                        <Calendar className="absolute top-3.5 left-4 h-5 w-5 text-gray-400" />
+                        <input 
+                          type="date" required
+                          className="pl-12 w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-sm font-bold text-gray-800"
+                          value={date} onChange={e => setDate(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="block text-sm font-bold text-gray-700">Mô tả kỷ niệm</label>
+                      <textarea 
+                        rows="3" placeholder="Ghi lại cảm xúc của bạn..."
+                        className="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-sm font-medium resize-none placeholder:text-gray-400 text-gray-800"
+                        value={description} onChange={e => setDescription(e.target.value)}
+                      ></textarea>
+                    </div>
+                    
+                    <button 
+                      type="submit" disabled={loading}
+                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl hover:shadow-blue-500/20 hover:-translate-y-0.5 transition-all flex justify-center items-center gap-2 mt-8 disabled:opacity-70 disabled:hover:translate-y-0 text-base outline-none"
+                    >
+                      {loading ? <><Loader2 className="animate-spin" size={22}/> Đang tải lên...</> : 'Lưu Giữ Trên Đám Mây'}
+                    </button>
+                  </form>
                 </div>
-              ))}
+              </div>
             </div>
-          )}
-        </div>
-      </main>
+
+          </div>
+        </main>
+      </div>
     </div>
   );
 }
