@@ -154,6 +154,33 @@ app.get('/api/photos', authenticateToken, async (req, res) => {
     }
 });
 
+// --- API: Xóa ảnh ---
+app.delete('/api/photos/:id', authenticateToken, async (req, res) => {
+    try {
+        const photoId = req.params.id;
+        
+        // Kiểm tra xem ảnh hợp lệ và thuộc về người dùng hiện tại không
+        const photo = await db.collection('photos').findOne({ 
+            _id: new ObjectId(photoId),
+            userId: req.user.id
+        });
+
+        if (!photo) {
+            return res.status(404).send({ message: 'Không tìm thấy ảnh hoặc bạn không có quyền xóa.' });
+        }
+
+        // Tùy chọn: Xóa ảnh khỏi S3/DO Spaces ở đây nếu cần thiết trong tương lai
+        // ...
+
+        // Xóa thông tin ảnh khỏi Database
+        await db.collection('photos').deleteOne({ _id: new ObjectId(photoId) });
+        
+        res.status(200).send({ message: 'Xóa ảnh thành công.' });
+    } catch (error) {
+        res.status(500).send({ message: 'Lỗi xóa ảnh', error: error.message });
+    }
+});
+
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Backend server đang chạy tại port ${PORT}`);
