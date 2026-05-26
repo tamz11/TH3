@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
-import { Camera, User, Lock } from 'lucide-react';
+import { Camera, User, Lock, ArrowRight } from 'lucide-react';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.MODE === 'development' ? 'http://localhost:3001' : '');
 
@@ -22,42 +22,44 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 space-y-6">
+    <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-emerald-50 via-gray-100 to-white flex items-center justify-center p-4">
+      <div className="max-w-md w-full bg-white/70 backdrop-blur-xl rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/50 p-8 sm:p-10 space-y-8 transition-all">
         <div className="text-center">
-          <Camera className="mx-auto h-12 w-12 text-green-500 mb-4" />
-          <h2 className="text-3xl font-extrabold text-gray-900">Tạo tài khoản mới</h2>
-          <p className="mt-2 text-sm text-gray-500">Bắt đầu lưu giữ những kỷ niệm đẹp</p>
+          <div className="inline-flex items-center justify-center p-3 bg-gradient-to-tr from-emerald-500 to-teal-400 rounded-2xl mb-4 shadow-lg shadow-emerald-500/30 text-white">
+            <Camera className="h-8 w-8" />
+          </div>
+          <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600 tracking-tight">Tạo tài khoản mới</h2>
+          <p className="mt-2 text-sm text-gray-500 font-medium">Bắt đầu lưu giữ những kỷ niệm đẹp</p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleRegister}>
-          <div className="space-y-4">
-            <div className="relative">
-              <User className="absolute top-3 left-3 h-5 w-5 text-gray-400" />
+          <div className="space-y-5">
+            <div className="relative group">
+              <User className="absolute top-3.5 left-4 h-5 w-5 text-gray-400 group-focus-within:text-emerald-500 transition-colors" />
               <input
                 type="text"
                 required
-                className="pl-10 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="pl-12 w-full px-4 py-3.5 bg-white/60 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 focus:bg-white transition-all text-gray-700 font-medium placeholder:font-normal"
                 placeholder="Tên đăng nhập"
                 value={username} onChange={e => setUsername(e.target.value)}
               />
             </div>
-            <div className="relative">
-              <Lock className="absolute top-3 left-3 h-5 w-5 text-gray-400" />
+            <div className="relative group">
+              <Lock className="absolute top-3.5 left-4 h-5 w-5 text-gray-400 group-focus-within:text-emerald-500 transition-colors" />
               <input
                 type="password"
                 required
-                className="pl-10 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="pl-12 w-full px-4 py-3.5 bg-white/60 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 focus:bg-white transition-all text-gray-700 font-medium placeholder:font-normal"
                 placeholder="Mật khẩu"
                 value={password} onChange={e => setPassword(e.target.value)}
               />
             </div>
           </div>
-          <button type="submit" className="w-full py-3 px-4 border border-transparent rounded-lg shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none font-bold">
-            Đăng ký
+          <button type="submit" className="w-full py-3.5 px-4 rounded-xl shadow-[0_4px_14px_0_rgba(16,185,129,0.39)] text-white bg-gradient-to-r from-emerald-600 to-emerald-500 hover:shadow-[0_6px_20px_rgba(16,185,129,0.23)] hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 font-bold text-lg transition-all flex items-center justify-center gap-2 group">
+            Đăng ký <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </button>
         </form>
-        <div className="text-center mt-4 text-sm text-gray-600">
-          Đã có tài khoản? <Link to="/login" className="text-green-500 font-bold hover:underline">Đăng nhập</Link>
+        <div className="text-center mt-6 text-sm text-gray-600">
+          Đã có tài khoản? <Link to="/login" className="text-emerald-600 font-bold hover:text-emerald-700 transition-colors ml-1">Đăng nhập</Link>
         </div>
       </div>
     </div>

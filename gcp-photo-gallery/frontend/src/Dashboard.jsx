@@ -81,7 +81,6 @@ export default function Dashboard() {
     window.location.href = '/login';
   };
 
-  // Group photos by month and year
   const groupedPhotos = photos.reduce((acc, photo) => {
     const monthYear = format(parseISO(photo.date), 'MMMM - yyyy', { locale: vi });
     if (!acc[monthYear]) acc[monthYear] = [];
@@ -90,19 +89,28 @@ export default function Dashboard() {
   }, {});
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
+    <div className="min-h-screen bg-[#F8FAFC] pb-20 font-inter">
       {/* Header */}
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-600">
+      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <div className="bg-gradient-to-tr from-blue-600 to-purple-600 p-2 rounded-xl shadow-lg shadow-blue-500/20">
+              <Camera size={24} className="text-white" />
+            </div>
+            <span className="text-xl sm:text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 hidden sm:block tracking-tight">
               Kỷ Niệm Đám Mây
             </span>
           </div>
-          <div className="flex items-center gap-4">
-            <span className="text-gray-600 font-medium">👋 {username}</span>
-            <button onClick={logout} className="p-2 text-red-500 hover:bg-red-50 rounded-full transition">
-              <LogOut size={20} />
+          <div className="flex items-center gap-3 sm:gap-5">
+            <div className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-full border border-gray-200/60 shadow-sm">
+              <div className="w-7 h-7 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white text-xs font-bold">
+                {username ? username.charAt(0).toUpperCase() : 'U'}
+              </div>
+              <span className="text-gray-700 font-semibold text-sm hidden sm:block tracking-wide">{username}</span>
+            </div>
+            <button onClick={logout} className="p-2 sm:px-4 sm:py-2 flex items-center gap-2 text-red-500 hover:bg-red-50 hover:text-red-700 rounded-full sm:rounded-xl transition-colors font-semibold">
+              <LogOut size={18} strokeWidth={2.5} />
+              <span className="hidden sm:block text-sm">Đăng xuất</span>
             </button>
           </div>
         </div>
@@ -110,91 +118,111 @@ export default function Dashboard() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 flex flex-col md:flex-row gap-8">
         {/* Upload Form */}
-        <div className="md:w-1/3">
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 sticky top-8">
-            <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2 mb-4">
-              <ImagePlus size={20} className="text-blue-500" /> Thêm kỷ niệm mới
-            </h3>
-            <form onSubmit={handleUpload} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Ảnh của bạn</label>
-                <input 
-                  type="file" accept="image/*" required
-                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                  onChange={e => setFile(e.target.files[0])}
-                />
+        <div className="md:w-[320px] lg:w-[380px] shrink-0">
+          <div className="bg-white p-6 sm:p-7 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 sticky top-28">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2.5 bg-blue-50 text-blue-600 rounded-xl shadow-sm border border-blue-100">
+                <ImagePlus size={22} strokeWidth={2.5} />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Chủ đề</label>
+              <h3 className="text-xl font-extrabold text-gray-800 tracking-tight">Thêm kỷ niệm</h3>
+            </div>
+            <form onSubmit={handleUpload} className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="block text-sm font-bold text-gray-700">Ảnh của bạn</label>
+                <div className="flex items-center justify-center w-full">
+                  <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-2xl cursor-pointer bg-gray-50/50 hover:bg-blue-50/50 hover:border-blue-400 transition-colors group">
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
+                      <ImagePlus className="w-8 h-8 mb-2 text-gray-400 group-hover:text-blue-500 transition-colors" />
+                      <p className="text-xs text-gray-500 font-medium line-clamp-1">{file ? file.name : 'Nhấn để chọn ảnh'}</p>
+                    </div>
+                    <input id="dropzone-file" type="file" className="hidden" accept="image/*" onChange={e => setFile(e.target.files[0])} required={!file} />
+                  </label>
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <label className="block text-sm font-bold text-gray-700">Chủ đề</label>
                 <input 
-                  type="text" required placeholder="Chuyến đi Đà Lạt..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  type="text" required placeholder="Ví dụ: Chuyến đi Đà Lạt..."
+                  className="w-full px-4 py-3 bg-gray-50/50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 focus:bg-white transition-all text-sm font-medium placeholder:font-normal text-gray-800"
                   value={title} onChange={e => setTitle(e.target.value)}
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Ngày kỷ niệm</label>
+              <div className="space-y-1.5">
+                <label className="block text-sm font-bold text-gray-700">Ngày kỷ niệm</label>
                 <div className="relative">
-                  <Calendar className="absolute top-2.5 left-3 h-5 w-5 text-gray-400" />
+                  <Calendar className="absolute top-3 left-4 h-5 w-5 text-gray-400" />
                   <input 
                     type="date" required
-                    className="pl-10 w-full px-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="pl-12 w-full px-4 py-3 bg-gray-50/50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 focus:bg-white transition-all text-sm font-medium text-gray-800"
                     value={date} onChange={e => setDate(e.target.value)}
                   />
                 </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Kể lại đôi chút</label>
+              <div className="space-y-1.5">
+                <label className="block text-sm font-bold text-gray-700">Kể lại đôi chút</label>
                 <textarea 
                   rows="3" placeholder="Hôm đó trời rất đẹp..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                  className="w-full px-4 py-3 bg-gray-50/50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 focus:bg-white transition-all text-sm font-medium resize-none placeholder:font-normal text-gray-800"
                   value={description} onChange={e => setDescription(e.target.value)}
                 ></textarea>
               </div>
               <button 
                 type="submit" disabled={loading}
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-3 rounded-lg shadow-md hover:shadow-lg transition flex justify-center items-center gap-2"
+                className="w-full bg-gradient-to-r from-blue-600 to-blue-500 text-white font-bold py-3.5 rounded-xl shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] hover:shadow-[0_6px_20px_rgba(37,99,235,0.23)] hover:-translate-y-0.5 transition-all flex justify-center items-center gap-2 mt-6 disabled:opacity-70 disabled:hover:translate-y-0"
               >
-                {loading ? <><Loader2 className="animate-spin" size={20}/> Đang tải lên...</> : 'Lưu giữ Kỷ Niệm'}
+                {loading ? <><Loader2 className="animate-spin" size={20}/> Đang tải lên...</> : 'Lưu Giữ Kỷ Niệm'}
               </button>
             </form>
           </div>
         </div>
 
         {/* Timeline Gallery */}
-        <div className="md:w-2/3">
+        <div className="md:flex-1">
           {Object.keys(groupedPhotos).length === 0 ? (
-            <div className="text-center py-20 text-gray-500">
-              <Camera size={48} className="mx-auto mb-4 text-gray-300" />
-              <p className="text-lg">Chưa có kỷ niệm nào.</p>
-              <p className="text-sm">Hãy tải lên bức ảnh đầu tiên của bạn!</p>
+            <div className="flex flex-col items-center justify-center h-full py-20 px-4 text-center bg-white rounded-3xl border border-dashed border-gray-200 shadow-sm mt-8 md:mt-0">
+              <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mb-5 shadow-inner">
+                <Camera size={36} className="text-blue-400" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">Chưa có kỷ niệm nào</h3>
+              <p className="text-gray-500 max-w-sm text-sm">Hãy tạo album đầu tiên bằng cách tải lên những bức ảnh yêu thích của bạn nhé!</p>
             </div>
           ) : (
-            Object.entries(groupedPhotos).map(([monthYear, monthPhotos]) => (
-              <div key={monthYear} className="mb-10">
-                <h2 className="text-2xl font-extrabold text-gray-800 mb-6 border-b-2 border-gray-200 pb-2 capitalize">
-                  {monthYear}
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  {monthPhotos.map(photo => (
-                    <div key={photo.id} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-shadow duration-300 border border-gray-100">
-                      <div className="aspect-[4/3] w-full relative">
-                        <img src={photo.imageUrl} alt={photo.title} className="absolute inset-0 w-full h-full object-cover" />
-                      </div>
-                      <div className="p-5">
-                        <div className="flex justify-between items-start mb-2">
-                          <h4 className="text-lg font-bold text-gray-900">{photo.title}</h4>
-                          <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
-                            {format(parseISO(photo.date), 'dd/MM/yyyy')}
-                          </span>
+            <div className="space-y-12 pb-10">
+              {Object.entries(groupedPhotos).map(([monthYear, monthPhotos]) => (
+                <div key={monthYear} className="relative">
+                  <div className="flex items-center gap-4 mb-6 sticky top-24 z-30 pt-4 pb-2 bg-[#F8FAFC]/90 backdrop-blur-sm">
+                    <h2 className="text-lg font-black text-gray-800 capitalize bg-white px-5 py-2 rounded-full shadow-sm border border-gray-100/50 inline-block">
+                      {monthYear}
+                    </h2>
+                    <div className="h-px bg-gradient-to-r from-gray-200 to-transparent flex-1 rounded-full"></div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {monthPhotos.map(photo => (
+                      <div key={photo.id} className="group bg-white rounded-3xl overflow-hidden shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.1)] transition-all duration-500 border border-gray-100 flex flex-col hover:-translate-y-1">
+                        <div className="aspect-[4/4] sm:aspect-[4/3] w-full relative overflow-hidden bg-gray-100">
+                          <img 
+                            src={photo.imageUrl} 
+                            alt={photo.title} 
+                            className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 ease-out" 
+                            loading="lazy"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-gray-900/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         </div>
-                        <p className="text-sm text-gray-600 line-clamp-3">{photo.description}</p>
+                        <div className="p-5 flex-1 flex flex-col bg-white z-10 relative">
+                          <div className="flex justify-between items-start gap-3 mb-2">
+                            <h4 className="text-base font-bold text-gray-900 leading-tight">{photo.title}</h4>
+                            <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full whitespace-nowrap border border-blue-100">
+                              {format(parseISO(photo.date), 'dd/MM')}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-500 line-clamp-3 leading-relaxed mt-1 font-medium">{photo.description}</p>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))
+              ))}
+            </div>
           )}
         </div>
       </main>
