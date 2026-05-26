@@ -4,7 +4,7 @@ import { LogOut, ImagePlus, Loader2, Calendar, Camera } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { vi } from 'date-fns/locale';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.MODE === 'development' ? 'http://localhost:3001' : '');
 
 export default function Dashboard() {
   const [photos, setPhotos] = useState([]);
