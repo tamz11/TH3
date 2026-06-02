@@ -167,9 +167,8 @@ export default function Dashboard() {
           <div className="w-[50px] h-[50px] bg-[#89D1FF] text-xl font-bold text-slate-800 rounded-[1.25rem] flex items-center justify-center mr-4 shrink-0 shadow-sm">
             z
           </div>
-          <div className="flex flex-col">
-            <span className="text-[17px] font-black text-gray-900 leading-tight">Unicare</span>
-            <span className="text-[13px] text-gray-500 font-medium mt-0.5">Cổng Zoho</span>
+          <div className="flex flex-col justify-center">
+            <span className="text-[17px] font-black text-gray-900 leading-tight">Cổng Zoho</span>
           </div>
         </div>
         
