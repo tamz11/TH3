@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { LogOut, ImagePlus, Loader2, Calendar, Camera, Search, Bell, Home, FolderHeart, Settings, Mail, LayoutGrid, Image as ImageIcon, X, Download, Trash2, Send } from 'lucide-react';
+import { LogOut, ImagePlus, Loader2, Calendar, Camera, Search, Bell, FolderHeart, Mail, LayoutGrid, Image as ImageIcon, X, Download, Trash2, Send } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { vi } from 'date-fns/locale';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.MODE === 'development' ? 'http://localhost:3001' : '');
+const ZOHO_CRM_URL = 'https://crm.zoho.com/crm/WebToLeadForm';
 
 export default function Dashboard() {
   const [photos, setPhotos] = useState([]);
@@ -18,15 +19,7 @@ export default function Dashboard() {
   const token = localStorage.getItem('token');
   const username = localStorage.getItem('username');
 
-  useEffect(() => {
-    if (!token) {
-      window.location.href = '/login';
-    } else {
-      fetchPhotos();
-    }
-  }, [token]);
-
-  const fetchPhotos = async () => {
+  async function fetchPhotos() {
     try {
       const res = await axios.get(`${API_BASE_URL}/api/photos`, {
         headers: { Authorization: `Bearer ${token}` }
@@ -39,7 +32,31 @@ export default function Dashboard() {
         window.location.reload();
       }
     }
-  };
+  }
+
+  useEffect(() => {
+    if (!token) {
+      window.location.href = '/login';
+      return;
+    }
+
+    const loadPhotos = async () => {
+      try {
+        const res = await axios.get(`${API_BASE_URL}/api/photos`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setPhotos(res.data);
+      } catch (err) {
+        console.error(err);
+        if (err.response?.status === 403) {
+          localStorage.clear();
+          window.location.reload();
+        }
+      }
+    };
+
+    loadPhotos();
+  }, [token]);
 
   const handleUpload = async (e) => {
     e.preventDefault();
@@ -71,6 +88,7 @@ export default function Dashboard() {
       setDescription('');
       fetchPhotos();
     } catch (err) {
+      console.error(err);
       alert('Tải ảnh thất bại!');
     } finally {
       setLoading(false);
@@ -86,6 +104,7 @@ export default function Dashboard() {
       setPhotos(photos.filter(p => p.id !== id));
       if (selectedPhoto?.id === id) setSelectedPhoto(null);
     } catch (err) {
+      console.error(err);
       alert('Không thể xóa ảnh.');
     }
   };
@@ -141,6 +160,12 @@ export default function Dashboard() {
   const [contactMessage, setContactMessage] = useState('');
   const [contactStatus, setContactStatus] = useState(null);
 
+  const [crmCompany, setCrmCompany] = useState('');
+  const [crmEmail, setCrmEmail] = useState('');
+  const [crmPhone, setCrmPhone] = useState('');
+  const [crmLastName, setCrmLastName] = useState('');
+  const [crmStatus, setCrmStatus] = useState(null);
+
   const handleContactSubmit = async (e) => {
     e.preventDefault();
     setContactStatus('loading');
@@ -155,8 +180,53 @@ export default function Dashboard() {
       setContactEmail('');
       setContactMessage('');
     } catch (err) {
+      console.error(err);
       setContactStatus('error');
     }
+  };
+
+  const handleCrmSubmit = (e) => {
+    e.preventDefault();
+    if (!crmCompany.trim() || !crmLastName.trim()) {
+      setCrmStatus('error');
+      return;
+    }
+
+    setCrmStatus('loading');
+
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = ZOHO_CRM_URL;
+    form.target = '_blank';
+
+    const fields = {
+      xnQsjsdp: '5fc1922f8a9f2621f9562cfe403b07dd046680636e31784c678852ec0bc1c340',
+      xmIwtLD: '1ab1d94c48baaf621e03241b44bb935ad0bc52ab3decc3c9c99679b2cfb19bd22e163ae38b4eb86cb2e60feb23061243',
+      actionType: 'TGVhZHM=',
+      returnURL: 'null',
+      Company: crmCompany,
+      Email: crmEmail,
+      Phone: crmPhone,
+      'Last Name': crmLastName
+    };
+
+    Object.entries(fields).forEach(([name, value]) => {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = name;
+      input.value = value;
+      form.appendChild(input);
+    });
+
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form);
+
+    setCrmStatus('success');
+    setCrmCompany('');
+    setCrmEmail('');
+    setCrmPhone('');
+    setCrmLastName('');
   };
 
   return (
@@ -259,7 +329,79 @@ export default function Dashboard() {
             </div>
 
             {/* CONTENT SPLIT: GALLERY vs UPLOAD vs CONTACT */}
-            {activeMenu === 'Zoho Mail' ? (
+            {activeMenu === 'Zoho CRM' ? (
+              <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm max-w-3xl mx-auto">
+                <h2 className="text-2xl font-black text-gray-800 mb-6 flex items-center gap-3">
+                  <div className="p-3 bg-green-50 text-emerald-600 rounded-2xl">
+                    <Mail size={24} />
+                  </div>
+                  Zoho CRM - Thu thập thông tin khách hàng
+                </h2>
+
+                {crmStatus === 'success' && (
+                  <div className="mb-6 p-4 bg-green-50 text-green-700 rounded-xl border border-green-200 font-medium">
+                    Dữ liệu đã được gửi tới Zoho CRM. Mở tab mới để kiểm tra.
+                  </div>
+                )}
+                {crmStatus === 'error' && (
+                  <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-xl border border-red-200 font-medium">
+                    Vui lòng điền đủ Công ty và Họ.
+                  </div>
+                )}
+
+                <form onSubmit={handleCrmSubmit} className="space-y-5">
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">Công ty</label>
+                    <input
+                      type="text"
+                      required
+                      value={crmCompany}
+                      onChange={(e) => setCrmCompany(e.target.value)}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400 outline-none transition-all"
+                      placeholder="Tên công ty hoặc tổ chức"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">Họ và tên</label>
+                    <input
+                      type="text"
+                      required
+                      value={crmLastName}
+                      onChange={(e) => setCrmLastName(e.target.value)}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400 outline-none transition-all"
+                      placeholder="Họ và tên liên hệ"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">Email</label>
+                    <input
+                      type="email"
+                      value={crmEmail}
+                      onChange={(e) => setCrmEmail(e.target.value)}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400 outline-none transition-all"
+                      placeholder="Địa chỉ email liên hệ"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">Số điện thoại</label>
+                    <input
+                      type="tel"
+                      value={crmPhone}
+                      onChange={(e) => setCrmPhone(e.target.value)}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400 outline-none transition-all"
+                      placeholder="Số điện thoại liên hệ"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={crmStatus === 'loading'}
+                    className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl hover:shadow-emerald-500/20 transition-all flex justify-center items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                  >
+                    {crmStatus === 'loading' ? <><Loader2 className="animate-spin" size={22} /> Đang gửi tới Zoho...</> : 'Gửi vào Zoho CRM'}
+                  </button>
+                </form>
+              </div>
+            ) : activeMenu === 'Zoho Mail' ? (
               <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm max-w-2xl mx-auto">
                 <h2 className="text-2xl font-black text-gray-800 mb-6 flex items-center gap-3">
                   <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl">
@@ -267,7 +409,7 @@ export default function Dashboard() {
                   </div>
                   Liên hệ với chúng tôi
                 </h2>
-                
+
                 {contactStatus === 'success' && (
                   <div className="mb-6 p-4 bg-green-50 text-green-700 rounded-xl border border-green-200 font-medium">
                     Tin nhắn của bạn đã được gửi thành công!
