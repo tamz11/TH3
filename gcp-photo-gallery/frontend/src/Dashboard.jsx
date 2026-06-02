@@ -121,13 +121,19 @@ export default function Dashboard() {
   }, {});
 
   const menuItems = [
-    { icon: Home, label: 'Trang chủ', active: true },
-    { icon: ImageIcon, label: 'Tất cả ảnh' },
-    { icon: FolderHeart, label: 'Album yêu thích' },
-    { icon: Settings, label: 'Cài đặt' },
-    { icon: Mail, label: 'Liên hệ' },
+    { label: 'Tổng quan' },
+    { label: 'Zoho Forms' },
+    { label: 'Zoho CRM' },
+    { label: 'Zoho Desk' },
+    { label: 'Zoho SalesIQ' },
+    { label: 'Zoho Mail' },
+    { label: 'Zoho Campaigns' },
+    { label: 'Zoho Analytics' },
+    { label: 'Zoho Bookings' },
+    { label: 'Zoho Projects' },
+    { label: 'Zoho WorkDrive' },
   ];
-  const [activeMenu, setActiveMenu] = useState('Trang chủ');
+  const [activeMenu, setActiveMenu] = useState('Tổng quan');
 
   // Contact Form State
   const [contactName, setContactName] = useState('');
@@ -154,31 +160,32 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex h-screen bg-[#F8FAFC] font-inter overflow-hidden text-gray-800">
+    <div className="flex h-screen bg-[#F4F7FB] font-inter overflow-hidden text-gray-800">
       {/* SIDEBAR - Desktop */}
-      <aside className="w-64 bg-white border-r border-gray-200 hidden lg:flex flex-col z-20">
-        <div className="h-20 flex items-center px-6 border-b border-gray-100 shrink-0">
-          <div className="bg-gradient-to-tr from-blue-600 to-purple-600 p-2 rounded-xl shadow-md mr-3">
-            <Camera size={22} className="text-white" />
+      <aside className="w-[280px] bg-[#F4F7FB] hidden lg:flex flex-col z-20">
+        <div className="h-28 flex items-center px-8 shrink-0 pt-6">
+          <div className="w-[50px] h-[50px] bg-[#89D1FF] text-xl font-bold text-slate-800 rounded-[1.25rem] flex items-center justify-center mr-4 shrink-0 shadow-sm">
+            z
           </div>
-          <span className="text-xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 tracking-tight">Kỷ Niệm Của Bạn</span>
+          <div className="flex flex-col">
+            <span className="text-[17px] font-black text-gray-900 leading-tight">Unicare</span>
+            <span className="text-[13px] text-gray-500 font-medium mt-0.5">Cổng Zoho</span>
+          </div>
         </div>
         
-        <div className="flex-1 py-8 px-5 space-y-2 overflow-y-auto w-full">
-          <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 px-2">Menu Chính</p>
+        <div className="flex-1 py-4 px-5 space-y-1.5 overflow-y-auto w-full scrollbar-hide">
           {menuItems.map(item => (
             <button 
               key={item.label}
               onClick={() => setActiveMenu(item.label)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-semibold text-sm outline-none ${item.label === activeMenu ? 'bg-blue-50 text-blue-600 shadow-sm' : 'text-gray-600 hover:bg-gray-50'}`}
+              className={`w-full text-left px-5 py-3.5 rounded-[1rem] transition-all font-bold text-[15px] outline-none ${item.label === activeMenu ? 'bg-[#E5F3FF] text-gray-900' : 'text-slate-600 hover:bg-gray-200/50 hover:text-gray-900'}`}
             >
-              <item.icon size={20} strokeWidth={item.label === activeMenu ? 2.5 : 2} />
               {item.label}
             </button>
           ))}
         </div>
 
-        <div className="p-5 border-t border-gray-100 w-full">
+        <div className="p-5 w-full shrink-0">
           <button onClick={logout} className="w-full flex items-center justify-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-colors font-bold text-sm outline-none">
             <LogOut size={20} strokeWidth={2.5} />
             Đăng xuất
@@ -253,7 +260,7 @@ export default function Dashboard() {
             </div>
 
             {/* CONTENT SPLIT: GALLERY vs UPLOAD vs CONTACT */}
-            {activeMenu === 'Liên hệ' ? (
+            {activeMenu === 'Zoho Mail' ? (
               <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm max-w-2xl mx-auto">
                 <h2 className="text-2xl font-black text-gray-800 mb-6 flex items-center gap-3">
                   <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl">
