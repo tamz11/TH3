@@ -62,6 +62,12 @@ export default function Login() {
         <div className="text-center mt-6 text-sm text-gray-600">
           Chưa có tài khoản? <Link to="/register" className="text-blue-600 font-bold hover:text-blue-700 transition-colors ml-1">Đăng ký ngay</Link>
         </div>
+        <div className="text-center pt-6 mt-6 border-t border-gray-100 flex flex-col items-center gap-1">
+          <span className="text-xs text-gray-400 font-medium uppercase tracking-wider">Cần hỗ trợ?</span>
+          <a href="mailto:g1165httt@memoriesstore.app" className="inline-flex items-center gap-1.5 text-sm font-bold text-gray-600 hover:text-blue-600 transition-colors">
+            <Mail size={14} /> g1165httt@memoriesstore.app
+          </a>
+        </div>
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { LogOut, ImagePlus, Loader2, Calendar, Camera, Search, Bell, Home, FolderHeart, Settings, LayoutGrid, Image as ImageIcon, X, Download, Trash2 } from 'lucide-react';
+import { LogOut, ImagePlus, Loader2, Calendar, Camera, Search, Bell, Home, FolderHeart, Settings, Mail, LayoutGrid, Image as ImageIcon, X, Download, Trash2, Send } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { vi } from 'date-fns/locale';
 
@@ -125,8 +125,33 @@ export default function Dashboard() {
     { icon: ImageIcon, label: 'Tất cả ảnh' },
     { icon: FolderHeart, label: 'Album yêu thích' },
     { icon: Settings, label: 'Cài đặt' },
+    { icon: Mail, label: 'Liên hệ' },
   ];
   const [activeMenu, setActiveMenu] = useState('Trang chủ');
+
+  // Contact Form State
+  const [contactName, setContactName] = useState('');
+  const [contactEmail, setContactEmail] = useState('');
+  const [contactMessage, setContactMessage] = useState('');
+  const [contactStatus, setContactStatus] = useState(null);
+
+  const handleContactSubmit = async (e) => {
+    e.preventDefault();
+    setContactStatus('loading');
+    try {
+      await axios.post(`${API_BASE_URL}/api/send-email`, {
+        name: contactName,
+        email: contactEmail,
+        message: contactMessage
+      });
+      setContactStatus('success');
+      setContactName('');
+      setContactEmail('');
+      setContactMessage('');
+    } catch (err) {
+      setContactStatus('error');
+    }
+  };
 
   return (
     <div className="flex h-screen bg-[#F8FAFC] font-inter overflow-hidden text-gray-800">
@@ -227,8 +252,72 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* CONTENT SPLIT: GALLERY vs UPLOAD */}
-            <div className="flex flex-col-reverse xl:flex-row gap-10">
+            {/* CONTENT SPLIT: GALLERY vs UPLOAD vs CONTACT */}
+            {activeMenu === 'Liên hệ' ? (
+              <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm max-w-2xl mx-auto">
+                <h2 className="text-2xl font-black text-gray-800 mb-6 flex items-center gap-3">
+                  <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl">
+                    <Mail size={24} />
+                  </div>
+                  Liên hệ với chúng tôi
+                </h2>
+                
+                {contactStatus === 'success' && (
+                  <div className="mb-6 p-4 bg-green-50 text-green-700 rounded-xl border border-green-200 font-medium">
+                    Tin nhắn của bạn đã được gửi thành công!
+                  </div>
+                )}
+                {contactStatus === 'error' && (
+                  <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-xl border border-red-200 font-medium">
+                    Có lỗi xảy ra khi gửi tin nhắn. Vui lòng thử lại sau.
+                  </div>
+                )}
+
+                <form onSubmit={handleContactSubmit} className="space-y-5">
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">Họ và tên</label>
+                    <input 
+                      type="text" 
+                      required 
+                      value={contactName}
+                      onChange={(e) => setContactName(e.target.value)}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 outline-none transition-all"
+                      placeholder="Nhập tên của bạn"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">Email</label>
+                    <input 
+                      type="email" 
+                      required 
+                      value={contactEmail}
+                      onChange={(e) => setContactEmail(e.target.value)}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 outline-none transition-all"
+                      placeholder="Nhập email liên hệ"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">Lời nhắn</label>
+                    <textarea 
+                      required 
+                      rows="5"
+                      value={contactMessage}
+                      onChange={(e) => setContactMessage(e.target.value)}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 outline-none transition-all resize-none"
+                      placeholder="Bạn muốn nhắn nhủ điều gì..."
+                    ></textarea>
+                  </div>
+                  <button 
+                    type="submit" 
+                    disabled={contactStatus === 'loading'}
+                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-blue-500/30 flex items-center justify-center gap-2 transition-all disabled:opacity-70 disabled:cursor-not-allowed"
+                  >
+                    {contactStatus === 'loading' ? <Loader2 className="animate-spin" size={20} /> : <><Send size={20} /> Gửi tin nhắn</>}
+                  </button>
+                </form>
+              </div>
+            ) : (
+              <div className="flex flex-col-reverse xl:flex-row gap-10">
               
               {/* TIMELINE GALLERY */}
               <div className="flex-1 w-full relative">
@@ -372,16 +461,7 @@ export default function Dashboard() {
                 </div>
               </div>
             </div>
-
-          </div>
-        </main>
-      </div>
-
-      {/* Modal - Photo Details */}
-      {selectedPhoto && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 lg:p-10">
-          <div className="absolute inset-0 bg-gray-900/90 backdrop-blur-sm transition-opacity" onClick={() => setSelectedPhoto(null)}></div>
-          <div className="relative bg-white rounded-3xl overflow-hidden max-w-6xl w-full flex flex-col md:flex-row shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+            )}
             <button 
               onClick={() => setSelectedPhoto(null)}
               className="absolute top-4 right-4 md:top-6 md:right-6 z-20 p-2 bg-gray-900/40 hover:bg-gray-900/80 backdrop-blur-md text-white rounded-full transition-colors"

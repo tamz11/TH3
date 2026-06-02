@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
-import { Camera, User, Lock, ArrowRight } from 'lucide-react';
+import { Camera, User, Lock, ArrowRight, Mail } from 'lucide-react';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.MODE === 'development' ? 'http://localhost:3001' : '');
 
@@ -60,6 +60,12 @@ export default function Register() {
         </form>
         <div className="text-center mt-6 text-sm text-gray-600">
           Đã có tài khoản? <Link to="/login" className="text-emerald-600 font-bold hover:text-emerald-700 transition-colors ml-1">Đăng nhập</Link>
+        </div>
+        <div className="text-center pt-6 mt-6 border-t border-gray-100 flex flex-col items-center gap-1">
+          <span className="text-xs text-gray-400 font-medium uppercase tracking-wider">Cần hỗ trợ?</span>
+          <a href="mailto:g1165httt@memoriesstore.app" className="inline-flex items-center gap-1.5 text-sm font-bold text-gray-600 hover:text-emerald-600 transition-colors">
+            <Mail size={14} /> g1165httt@memoriesstore.app
+          </a>
         </div>
       </div>
     </div>

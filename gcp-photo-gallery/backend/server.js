@@ -6,6 +6,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { S3Client } = require('@aws-sdk/client-s3');
 const { MongoClient, ObjectId } = require('mongodb');
+const nodemailer = require('nodemailer');
 require('dotenv').config();
 
 const app = express();
@@ -50,6 +51,34 @@ async function connectDB() {
     }
 }
 connectDB();
+
+// --- ZOHO MAIL SETUP ---
+const transporter = nodemailer.createTransport({
+    host: 'smtp.zoho.com',
+    port: 465,
+    secure: true,
+    auth: {
+        user: process.env.ZOHO_EMAIL,
+        pass: process.env.ZOHO_PASSWORD
+    }
+});
+
+app.post('/api/send-email', async (req, res) => {
+    const { name, email, message } = req.body;
+    try {
+        await transporter.sendMail({
+            from: process.env.ZOHO_EMAIL,
+            to: process.env.ZOHO_EMAIL, // Gửi về email của bạn
+            replyTo: email,
+            subject: `Liên hệ mới từ ${name} - ${email}`,
+            text: `Bạn nhận được liên hệ mới từ thư viện ảnh:\n\nTên: ${name}\nEmail: ${email}\n\nNội dung:\n${message}`
+        });
+        res.status(200).send({ success: true, message: 'Đã gửi email thành công.' });
+    } catch (error) {
+        console.error('Lỗi gửi email:', error);
+        res.status(500).send({ success: false, message: 'Lỗi gửi email', error: error.message });
+    }
+});
 
 // --- AUTH MIDDLEWARE ---
 const authenticateToken = (req, res, next) => {
