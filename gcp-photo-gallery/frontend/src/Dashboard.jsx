@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { LogOut, ImagePlus, Loader2, Calendar, Camera, Search, Bell, FolderHeart, Mail, LayoutGrid, Image as ImageIcon, X, Download, Trash2, Send } from 'lucide-react';
+import { LogOut, ImagePlus, Loader2, Calendar, Camera, Search, Bell, FolderHeart, Settings, Mail, LayoutGrid, Image as ImageIcon, X, Download, Trash2, Send } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { vi } from 'date-fns/locale';
 
@@ -17,7 +17,7 @@ export default function Dashboard() {
   const [selectedPhoto, setSelectedPhoto] = useState(null);
 
   const token = localStorage.getItem('token');
-  const username = localStorage.getItem('username');
+  const [username, setUsername] = useState(localStorage.getItem('username') || '');
 
   async function fetchPhotos() {
     try {
@@ -151,6 +151,7 @@ export default function Dashboard() {
     { label: 'Zoho Bookings' },
     { label: 'Zoho Projects' },
     { label: 'Zoho WorkDrive' },
+    { label: 'Cài đặt' },
   ];
   const [activeMenu, setActiveMenu] = useState('Tổng quan');
 
@@ -165,6 +166,14 @@ export default function Dashboard() {
   const [crmPhone, setCrmPhone] = useState('');
   const [crmLastName, setCrmLastName] = useState('');
   const [crmStatus, setCrmStatus] = useState(null);
+
+  const savedEmail = localStorage.getItem('email') || '';
+  const [profileName, setProfileName] = useState(username || '');
+  const [profileEmail, setProfileEmail] = useState(savedEmail);
+  const [profilePhone, setProfilePhone] = useState(localStorage.getItem('phone') || '');
+  const [profilePassword, setProfilePassword] = useState('');
+  const [profileConfirmPassword, setProfileConfirmPassword] = useState('');
+  const [settingsStatus, setSettingsStatus] = useState(null);
 
   const handleContactSubmit = async (e) => {
     e.preventDefault();
@@ -227,6 +236,27 @@ export default function Dashboard() {
     setCrmEmail('');
     setCrmPhone('');
     setCrmLastName('');
+  };
+
+  const handleSettingsSubmit = (e) => {
+    e.preventDefault();
+    if (!profileName.trim() || !profileEmail.trim()) {
+      setSettingsStatus('error');
+      return;
+    }
+    if (profilePassword && profilePassword !== profileConfirmPassword) {
+      setSettingsStatus('error');
+      return;
+    }
+
+    localStorage.setItem('username', profileName);
+    localStorage.setItem('email', profileEmail);
+    localStorage.setItem('phone', profilePhone);
+
+    setUsername(profileName);
+    setSettingsStatus('success');
+    setProfilePassword('');
+    setProfileConfirmPassword('');
   };
 
   return (
@@ -329,7 +359,90 @@ export default function Dashboard() {
             </div>
 
             {/* CONTENT SPLIT: GALLERY vs UPLOAD vs CONTACT */}
-            {activeMenu === 'Zoho CRM' ? (
+            {activeMenu === 'Cài đặt' ? (
+              <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm max-w-3xl mx-auto">
+                <h2 className="text-2xl font-black text-gray-800 mb-6 flex items-center gap-3">
+                  <div className="p-3 bg-slate-50 text-slate-700 rounded-2xl">
+                    <Settings size={24} />
+                  </div>
+                  Cài đặt người dùng
+                </h2>
+
+                {settingsStatus === 'success' && (
+                  <div className="mb-6 p-4 bg-green-50 text-green-700 rounded-xl border border-green-200 font-medium">
+                    Cập nhật cài đặt thành công.
+                  </div>
+                )}
+                {settingsStatus === 'error' && (
+                  <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-xl border border-red-200 font-medium">
+                    Vui lòng kiểm tra lại tên hoặc email, và xác nhận mật khẩu.
+                  </div>
+                )}
+
+                <form onSubmit={handleSettingsSubmit} className="space-y-5">
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">Tên hiển thị</label>
+                    <input
+                      type="text"
+                      required
+                      value={profileName}
+                      onChange={(e) => setProfileName(e.target.value)}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:bg-white focus:ring-2 focus:ring-slate-500/20 focus:border-slate-400 outline-none transition-all"
+                      placeholder="Tên của bạn"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">Email</label>
+                    <input
+                      type="email"
+                      required
+                      value={profileEmail}
+                      onChange={(e) => setProfileEmail(e.target.value)}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:bg-white focus:ring-2 focus:ring-slate-500/20 focus:border-slate-400 outline-none transition-all"
+                      placeholder="Email liên hệ"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">Số điện thoại</label>
+                    <input
+                      type="tel"
+                      value={profilePhone}
+                      onChange={(e) => setProfilePhone(e.target.value)}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:bg-white focus:ring-2 focus:ring-slate-500/20 focus:border-slate-400 outline-none transition-all"
+                      placeholder="Số điện thoại"
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-2">Mật khẩu mới</label>
+                      <input
+                        type="password"
+                        value={profilePassword}
+                        onChange={(e) => setProfilePassword(e.target.value)}
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:bg-white focus:ring-2 focus:ring-slate-500/20 focus:border-slate-400 outline-none transition-all"
+                        placeholder="Bỏ trống nếu không đổi"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-2">Xác nhận mật khẩu</label>
+                      <input
+                        type="password"
+                        value={profileConfirmPassword}
+                        onChange={(e) => setProfileConfirmPassword(e.target.value)}
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:bg-white focus:ring-2 focus:ring-slate-500/20 focus:border-slate-400 outline-none transition-all"
+                        placeholder="Nhập lại mật khẩu mới"
+                      />
+                    </div>
+                  </div>
+                  <button
+                    type="submit"
+                    className="w-full bg-gradient-to-r from-slate-700 to-slate-900 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl transition-all flex justify-center items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                  >
+                    Lưu cài đặt
+                  </button>
+                </form>
+              </div>
+            ) : activeMenu === 'Zoho CRM' ? (
               <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm max-w-3xl mx-auto">
                 <h2 className="text-2xl font-black text-gray-800 mb-6 flex items-center gap-3">
                   <div className="p-3 bg-green-50 text-emerald-600 rounded-2xl">
